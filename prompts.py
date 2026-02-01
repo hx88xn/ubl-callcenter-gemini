@@ -1,28 +1,18 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
-
-VOICE_GENDER_MAP = {
-    'alloy': 'male',
-    'echo': 'male',
-    'shimmer': 'female',
-    'ash': 'male',
-    'coral': 'female',
-    'sage': 'female'
-}
-
-VOICE_NAMES = {
-    'alloy': 'Asad',
-    'echo': 'Saad',
-    'shimmer': 'Aisha',
-    'ash': 'Omer',
-    'coral': 'Marvi',
-    'sage': 'Sara'
-}
+from gemini_live import GEMINI_VOICES
 
 
-def get_gendered_system_prompt(voice: str = 'sage') -> str:
-    gender = VOICE_GENDER_MAP.get(voice, 'female')
-    agent_name = VOICE_NAMES.get(voice, 'Sara')
+def get_voice_info(voice: str) -> tuple:
+    """Get voice name and gender from Gemini voice ID."""
+    voice_data = GEMINI_VOICES.get(voice, GEMINI_VOICES.get('Charon', {}))
+    name = voice_data.get('name', 'Saad')
+    gender = voice_data.get('gender', 'Male').lower()
+    return name, gender
+
+
+def get_gendered_system_prompt(voice: str = 'Charon') -> str:
+    agent_name, gender = get_voice_info(voice)
     
     if gender == 'male':
         greeting_urdu = f"Assalam Alaikam, mera naam {agent_name} hai, UBL Digital call karne ka shukriya, main aap ki kiya madad kar sakta hoon?"

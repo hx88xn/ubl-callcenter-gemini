@@ -43,7 +43,6 @@ from gemini_live import (
     GeminiLiveClient, 
     GeminiLiveConfig, 
     GeminiResponse,
-    get_gemini_voice,
     GEMINI_RECEIVE_SAMPLE_RATE
 )
 from audio_utils import convert_browser_to_gemini, convert_gemini_to_browser, reset_audio_states
@@ -106,12 +105,16 @@ async def index_page():
 
 from fastapi import Body
 
+from gemini_live import GEMINI_VOICES
+
+# Convert Gemini voices to UI format
 AVAILABLE_VOICES = {
-    'echo': {
-        'name': 'Saad',
-        'age': 'Young Male',
-        'personality': 'Warm, Friendly and Engaging'
+    voice_key: {
+        'name': voice_data['name'],
+        'age': voice_data['gender'],
+        'personality': voice_data['description']
     }
+    for voice_key, voice_data in GEMINI_VOICES.items()
 }
 
 
@@ -121,12 +124,13 @@ async def start_browser_call(request: Request, payload: dict = Body(...)):
     user_data = verify_jwt_token(token)
     
     phone = payload.get("phone", "webclient")
-    voice = payload.get("voice", "echo")
+    voice = payload.get("voice", "Charon")  # Default to Charon (Gemini's deep, informative voice)
     temperature = payload.get("temperature", 0.8)
     speed = payload.get("speed", 1.05)
     
+    # Validate voice is available in Gemini voices
     if voice not in AVAILABLE_VOICES:
-        voice = "echo"
+        voice = "Charon"
     
     temperature = max(0.0, min(1.2, float(temperature)))
     speed = max(0.5, min(2.0, float(speed)))
@@ -330,16 +334,13 @@ async def media_stream_browser(websocket: WebSocket):
         # Build Gemini configuration
         instructions = meta.get("instructions", "")
         caller = meta.get("phone", "")
-        openai_voice = meta.get("voice", "echo")
+        gemini_voice = meta.get("voice", "Charon")  # Now using Gemini voice names directly
         temperature = meta.get("temperature", 0.8)
-        
-        # Map OpenAI voice to Gemini voice
-        gemini_voice = get_gemini_voice(openai_voice)
         
         SYSTEM_MESSAGE = build_system_message(
             instructions=instructions,
             caller=caller,
-            voice=openai_voice  # Keep for gendered pronouns in system message
+            voice=gemini_voice
         )
         
         print(f"🔧 Initializing Gemini session with voice: {gemini_voice}, temp: {temperature}")

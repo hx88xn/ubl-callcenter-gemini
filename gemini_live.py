@@ -24,23 +24,51 @@ GEMINI_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
 GEMINI_SEND_SAMPLE_RATE = 16000  # Input audio sample rate
 GEMINI_RECEIVE_SAMPLE_RATE = 24000  # Output audio sample rate
 
-# Available Gemini voices (map OpenAI voices to Gemini equivalents)
+# All available Gemini Live API voices (30 HD voices)
+# Keys are Gemini API voice names, 'name' is human-friendly display name
 GEMINI_VOICES = {
-    'Puck': {'name': 'Puck', 'description': 'Upbeat and lively'},
-    'Charon': {'name': 'Charon', 'description': 'Calm and collected'},
-    'Kore': {'name': 'Kore', 'description': 'Gentle and reassuring'},
-    'Fenrir': {'name': 'Fenrir', 'description': 'Confident and authoritative'},
-    'Aoede': {'name': 'Aoede', 'description': 'Warm and friendly'},
+    # Original Live API voices
+    'Puck': {'name': 'Omar', 'gender': 'Male', 'description': 'Conversational, friendly, and upbeat'},
+    'Charon': {'name': 'Saad', 'gender': 'Male', 'description': 'Deep, informative, and authoritative'},
+    'Kore': {'name': 'Ayesha', 'gender': 'Female', 'description': 'Energetic, youthful, and professional'},
+    'Fenrir': {'name': 'Ahmed', 'gender': 'Male', 'description': 'Warm, approachable, and friendly'},
+    'Aoede': {'name': 'Sara', 'gender': 'Female', 'description': 'Clear, conversational, and thoughtful'},
+    # Extended TTS voices
+    'Achernar': {'name': 'Fatima', 'gender': 'Female', 'description': 'Soft and melodic'},
+    'Achird': {'name': 'Hassan', 'gender': 'Male', 'description': 'Steady and reliable'},
+    'Algenib': {'name': 'Ali', 'gender': 'Male', 'description': 'Bold and confident'},
+    'Algieba': {'name': 'Usman', 'gender': 'Male', 'description': 'Warm and expressive'},
+    'Alnilam': {'name': 'Bilal', 'gender': 'Male', 'description': 'Strong and resonant'},
+    'Autonoe': {'name': 'Nadia', 'gender': 'Female', 'description': 'Gentle and calming'},
+    'Callirrhoe': {'name': 'Zara', 'gender': 'Female', 'description': 'Flowing and graceful'},
+    'Despina': {'name': 'Hira', 'gender': 'Female', 'description': 'Bright and engaging'},
+    'Enceladus': {'name': 'Faisal', 'gender': 'Male', 'description': 'Cool and composed'},
+    'Erinome': {'name': 'Amina', 'gender': 'Female', 'description': 'Serene and peaceful'},
+    'Gacrux': {'name': 'Sana', 'gender': 'Female', 'description': 'Crisp and articulate'},
+    'Iapetus': {'name': 'Tariq', 'gender': 'Male', 'description': 'Deep and thoughtful'},
+    'Laomedeia': {'name': 'Maryam', 'gender': 'Female', 'description': 'Elegant and refined'},
+    'Leda': {'name': 'Layla', 'gender': 'Female', 'description': 'Sweet and pleasant'},
+    'Orus': {'name': 'Imran', 'gender': 'Male', 'description': 'Clear and direct'},
+    'Pulcherrima': {'name': 'Zainab', 'gender': 'Female', 'description': 'Beautiful and expressive'},
+    'Rasalgethi': {'name': 'Khalid', 'gender': 'Male', 'description': 'Mature and wise'},
+    'Sadachbia': {'name': 'Hamza', 'gender': 'Male', 'description': 'Gentle and soothing'},
+    'Sadaltager': {'name': 'Yusuf', 'gender': 'Male', 'description': 'Calm and measured'},
+    'Schedar': {'name': 'Rizwan', 'gender': 'Male', 'description': 'Rich and commanding'},
+    'Sulafat': {'name': 'Aisha', 'gender': 'Female', 'description': 'Warm and inviting'},
+    'Umbriel': {'name': 'Farhan', 'gender': 'Male', 'description': 'Mysterious and intriguing'},
+    'Vindemiatrix': {'name': 'Rabia', 'gender': 'Female', 'description': 'Sophisticated and elegant'},
+    'Zephyr': {'name': 'Meher', 'gender': 'Female', 'description': 'Light and breezy'},
+    'Zubenelgenubi': {'name': 'Waqar', 'gender': 'Male', 'description': 'Balanced and harmonious'},
 }
 
 # Map OpenAI voices to Gemini voices
 OPENAI_TO_GEMINI_VOICE_MAP = {
-    'echo': 'Charon',      # Male, calm
-    'alloy': 'Puck',       # Male, upbeat
-    'shimmer': 'Kore',     # Female, gentle
-    'ash': 'Fenrir',       # Male, confident
-    'coral': 'Aoede',      # Female, warm
-    'sage': 'Aoede',       # Female, warm
+    'echo': 'Charon',      # Male, calm and informative
+    'alloy': 'Puck',       # Male, upbeat and conversational
+    'shimmer': 'Kore',     # Female, energetic and youthful
+    'ash': 'Fenrir',       # Male, warm and friendly
+    'coral': 'Aoede',      # Female, clear and thoughtful
+    'sage': 'Aoede',       # Female, thoughtful
 }
 
 
