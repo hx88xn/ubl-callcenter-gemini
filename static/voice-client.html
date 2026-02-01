@@ -442,7 +442,10 @@
     let audioQueue = [], lastScheduledTime = 0, call_id;
     let selectedVoice = "echo", selectedTemp = 0.8, selectedSpeed = 1.05;
     let availableVoices = {}, callTimerInterval = null;
-    const MAX_SCHEDULE_LOOKAHEAD = 5.0;
+    // Reduced lookahead for lower latency audio playback
+    const MAX_SCHEDULE_LOOKAHEAD = 0.5;
+    // Native sample rate for Gemini input (16kHz) - no server-side resampling needed
+    const MIC_SAMPLE_RATE = 16000;
 
     function toggleVoiceDropdown() {
       const menu = document.getElementById("voiceDropdownMenu");
@@ -608,8 +611,9 @@
 
       ws.addEventListener("error", (err) => { log("⚠️ WebSocket error occurred"); });
 
-      micContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 8000 });
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: { noiseSuppression: true, echoCancellation: true, sampleRate: 8000 } });
+      // Use 16kHz sample rate to match Gemini's native input format (eliminates server-side resampling)
+      micContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: MIC_SAMPLE_RATE });
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: { noiseSuppression: true, echoCancellation: true, sampleRate: MIC_SAMPLE_RATE } });
       micSource = micContext.createMediaStreamSource(stream);
 
       const workletCode = `class AudioProcessor extends AudioWorkletProcessor { constructor() { super(); this.lastVoiceTime = currentTime; } process(inputs, outputs, parameters) { const input = inputs[0]; if (!input || !input[0]) return true; const ch = input[0]; let sum = 0; for (let i = 0; i < ch.length; i++) sum += ch[i] * ch[i]; const rms = Math.sqrt(sum / ch.length); const VOLUME_THRESHOLD = 0.04; const HANGOVER_MS = 0.5; if (rms > VOLUME_THRESHOLD) this.lastVoiceTime = currentTime; const shouldSendAudio = rms > VOLUME_THRESHOLD || (currentTime - this.lastVoiceTime) < HANGOVER_MS; this.port.postMessage({ audio: ch, sendAudio: shouldSendAudio }); return true; } } registerProcessor('audio-processor', AudioProcessor);`;

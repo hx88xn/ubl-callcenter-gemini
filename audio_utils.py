@@ -44,24 +44,29 @@ def resample_pcm(data: bytes, from_rate: int, to_rate: int, sample_width: int = 
     return converted
 
 
-def convert_browser_to_gemini(pcm_8khz: bytes) -> bytes:
+def convert_browser_to_gemini(pcm_data: bytes, input_rate: int = 16000) -> bytes:
     """
-    Convert browser PCM audio (8kHz) to Gemini format (16kHz).
+    Convert browser PCM audio to Gemini format (16kHz).
     
     Args:
-        pcm_8khz: 16-bit PCM audio at 8kHz sample rate
+        pcm_data: 16-bit PCM audio at input_rate sample rate
+        input_rate: Sample rate of input audio (16000 or 8000)
     
     Returns:
         16-bit PCM audio at 16kHz sample rate
     """
     global _upsample_state
     
-    if len(pcm_8khz) == 0:
-        return pcm_8khz
+    if len(pcm_data) == 0:
+        return pcm_data
+    
+    # If already at 16kHz (Gemini's native input rate), passthrough with zero conversion
+    if input_rate == 16000:
+        return pcm_data
     
     # Upsample 8kHz -> 16kHz (factor of 2) using state for continuity
     converted, _upsample_state = audioop.ratecv(
-        pcm_8khz, 2, 1, 8000, 16000, _upsample_state
+        pcm_data, 2, 1, input_rate, 16000, _upsample_state
     )
     return converted
 

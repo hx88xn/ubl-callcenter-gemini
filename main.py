@@ -373,15 +373,16 @@ async def media_stream_browser(websocket: WebSocket):
                         data = json.loads(msg)
                         
                         if data.get("event") == "media" and session_initialized:
-                            # Browser sends 8kHz PCM, decode and convert to 16kHz for Gemini
+                            # Browser now sends 16kHz PCM (Gemini's native input format)
                             payload_b64 = data["media"]["payload"]
-                            pcm_8khz = base64.b64decode(payload_b64)
-                            user_pcm_buffer.write(pcm_8khz)
+                            pcm_data = base64.b64decode(payload_b64)
+                            user_pcm_buffer.write(pcm_data)
                             
-                            # Convert to Gemini's expected format (16kHz)
-                            pcm_16khz = convert_browser_to_gemini(pcm_8khz)
+                            # Passthrough to Gemini (16kHz -> 16kHz, no conversion needed)
+                            # This eliminates resampling overhead for lower latency
+                            pcm_16khz = convert_browser_to_gemini(pcm_data, input_rate=16000)
                             
-                            # Send to Gemini
+                            # Send to Gemini immediately
                             await gemini_client.send_audio(pcm_16khz)
                         
                         elif data.get("event") == "stop":
@@ -574,8 +575,8 @@ async def media_stream_browser(websocket: WebSocket):
                     wf.setframerate(sample_rate)
                     wf.writeframes(pcm_data)
             
-            # User audio at 8kHz (browser mic rate), agent at 24kHz (Gemini output rate)
-            save_wav_file(user_file_path, user_pcm_buffer.getvalue(), sample_rate=8000)
+            # User audio at 16kHz (browser mic rate), agent at 24kHz (Gemini output rate)
+            save_wav_file(user_file_path, user_pcm_buffer.getvalue(), sample_rate=16000)
             save_wav_file(agent_file_path, agent_pcm_buffer.getvalue(), sample_rate=24000)
             
             print(f"✅ Saved user audio: {user_file_path}")
