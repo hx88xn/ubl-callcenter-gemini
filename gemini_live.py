@@ -221,6 +221,20 @@ class GeminiLiveClient:
         if self.config.tools:
             config["tools"] = convert_openai_tools_to_gemini_dict(self.config.tools)
         
+        # Add VAD (Voice Activity Detection) settings
+        # Using official Gemini API syntax from: https://ai.google.dev/gemini-api/docs/live-guide
+        config["realtime_input_config"] = {
+            "automatic_activity_detection": {
+                "disabled": False,
+                "start_of_speech_sensitivity": types.StartSensitivity.START_SENSITIVITY_LOW,
+                "end_of_speech_sensitivity": types.EndSensitivity.END_SENSITIVITY_LOW,
+                "prefix_padding_ms": 20,
+                "silence_duration_ms": 100,
+            }
+        }
+        
+        print(f"🎙️ VAD Settings: prefix_padding=20ms, silence_duration=100ms, sensitivity=LOW")
+        
         # Connect to Live API - this returns an async context manager
         self._session_context = self.client.aio.live.connect(
             model=GEMINI_MODEL,
